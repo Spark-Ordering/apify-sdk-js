@@ -185,7 +185,6 @@ export class CrawlerSetup implements CrawlerSetupOptions {
             launchContext: {
                 useChrome: this.input.useChrome,
                 launchOptions: {
-                    ignoreHTTPSErrors: this.input.ignoreSslErrors,
                     defaultViewport: DEFAULT_VIEWPORT,
                     devtools: this.devtools,
                     args,
