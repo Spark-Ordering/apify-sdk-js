@@ -15,6 +15,7 @@ import {
     PuppeteerCrawler,
     PuppeteerCrawlerOptions,
     EnqueueLinksOptions,
+    EnqueueStrategy,
     log,
     ProxyConfiguration,
 } from '@crawlee/puppeteer';
@@ -362,6 +363,7 @@ export class CrawlerSetup implements CrawlerSetupOptions {
             globs: this.input.globs,
             pseudoUrls: this.input.pseudoUrls,
             exclude: this.input.excludes,
+            strategy: EnqueueStrategy.All,
             transformRequestFunction: (requestOptions) => {
                 requestOptions.userData ??= {};
                 requestOptions.userData[META_KEY] = {
