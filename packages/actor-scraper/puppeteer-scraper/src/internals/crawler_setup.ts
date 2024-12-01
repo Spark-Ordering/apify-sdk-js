@@ -15,6 +15,7 @@ import {
     PuppeteerCrawler,
     PuppeteerCrawlerOptions,
     EnqueueLinksOptions,
+    EnqueueStrategy,
     log,
     ProxyConfiguration,
 } from '@crawlee/puppeteer';
@@ -352,9 +353,15 @@ export class CrawlerSetup implements CrawlerSetupOptions {
     private async _handleLinks({ request, enqueueLinks, enqueueLinksByClickingElements }: PuppeteerCrawlingContext) {
         if (!this.requestQueue) return;
         const currentDepth = (request.userData![META_KEY] as RequestMetadata).depth;
+        const sourceHostname = new URL(request.url).hostname;
         const hasReachedMaxDepth = this.input.maxCrawlingDepth && currentDepth >= this.input.maxCrawlingDepth;
         if (hasReachedMaxDepth) {
             log.debug(`Request ${request.url} reached the maximum crawling depth of ${currentDepth}.`);
+            return;
+        }
+        const originalHostname = new URL(this.input.startUrls[0].url).hostname;
+        if (originalHostname !== sourceHostname) {
+            log.info(`Not enqueuing any links from ${request.url} as it is not the root domain.`);
             return;
         }
 
@@ -362,6 +369,7 @@ export class CrawlerSetup implements CrawlerSetupOptions {
             globs: this.input.globs,
             pseudoUrls: this.input.pseudoUrls,
             exclude: this.input.excludes,
+            strategy: EnqueueStrategy.All,
             transformRequestFunction: (requestOptions) => {
                 requestOptions.userData ??= {};
                 requestOptions.userData[META_KEY] = {
