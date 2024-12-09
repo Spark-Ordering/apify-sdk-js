@@ -315,6 +315,16 @@ export class CrawlerSetup implements CrawlerSetupOptions {
         };
         const { context, state } = createContext(contextOptions);
 
+        // Get current page url
+        const currentPageUrl = await crawlingContext.page.url();
+        const currentPageHostname = new URL(currentPageUrl).hostname;
+        // Kill the crawler if we were redirected to a 3rd party
+        if (['www.grubhub.com', 'www.ubereats.com', 'www.doordash.com'].includes(currentPageHostname)) {
+            log.info(`Current page url: ${currentPageUrl}`);
+            log.info(`Redirected to a 3rd party domain. Killing the crawler.`);
+            return;
+        }
+
         if (this.input.closeCookieModals) {
             await sleep(500);
             await crawlingContext.page.evaluate(getInjectableScript());
