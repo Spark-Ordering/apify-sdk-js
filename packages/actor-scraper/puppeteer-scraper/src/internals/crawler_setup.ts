@@ -318,6 +318,8 @@ export class CrawlerSetup implements CrawlerSetupOptions {
         // Get current page url
         const currentPageUrl = await crawlingContext.page.url();
         const currentPageHostname = new URL(currentPageUrl).hostname;
+        log.info(`Current page url: ${currentPageUrl}`);
+        log.info(`Current page hostname: ${currentPageHostname}`);
         // Kill the crawler if we were redirected to a 3rd party
         if (['www.grubhub.com', 'www.ubereats.com', 'www.doordash.com'].includes(currentPageHostname)) {
             log.info(`Current page url: ${currentPageUrl}`);
