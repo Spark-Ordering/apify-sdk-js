@@ -350,17 +350,18 @@ export class CrawlerSetup implements CrawlerSetupOptions {
         return true;
     }
 
-    private async _handleLinks({ request, enqueueLinks, enqueueLinksByClickingElements }: PuppeteerCrawlingContext) {
+    private async _handleLinks({ request, enqueueLinks, enqueueLinksByClickingElements, page }: PuppeteerCrawlingContext) {
         if (!this.requestQueue) return;
         const currentDepth = (request.userData![META_KEY] as RequestMetadata).depth;
-        const sourceHostname = new URL(request.url).hostname;
         const hasReachedMaxDepth = this.input.maxCrawlingDepth && currentDepth >= this.input.maxCrawlingDepth;
         if (hasReachedMaxDepth) {
             log.debug(`Request ${request.url} reached the maximum crawling depth of ${currentDepth}.`);
             return;
         }
         const originalHostname = new URL(this.input.startUrls[0].url).hostname;
-        if (originalHostname !== sourceHostname) {
+        const renderUrl = page.url();
+        const renderHostname = new URL(renderUrl).hostname;
+        if (originalHostname !== renderHostname) {
             log.info(`Not enqueuing any links from ${request.url} as it is not the root domain.`);
             return;
         }
